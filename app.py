@@ -6,9 +6,13 @@ from playsound import playsound
 vv=0
 app = Flask(__name__)
 model1=joblib.load('forestfiremodel.pkl')
-
+camera=cv2.VideoCapture(0)
 fire_cascade = cv2.CascadeClassifier('fire_detection.xml')
 m2=joblib.load('m2.pkl')
+
+
+
+
 
 
 
@@ -24,9 +28,20 @@ def output():
 def co():
     return render_template("co.html")
 
+
+
+
+
+
+
+
+
+
+
+
+
     
 def generate_frames():
-    camera=cv2.VideoCapture(0)
     while True:
             
         ## read the camera frame
@@ -87,12 +102,11 @@ def predict():
     final=[np.array(int_features)]
     print(int_features)
     print(final)
-    
     prediction=model1.predict_proba(final)
     output='{0:.{1}f}'.format(prediction[0][1], 2)
 
     if output>str(0.5):
-        return render_template('output1.html',pred='Probability of fire occuring is {} \n Your Forest is in Danger'.format(output))
+        return render_template('output.html',pred='Probability of fire occuring is {} \n Your Forest is in Danger'.format(output))
     else:
         return render_template('output.html',pred='Probability of fire occuring is {} \n Your Forest is safe.'.format(output))
 
@@ -106,8 +120,10 @@ def index():
 @app.route('/video')
 
 def video():
-    
+
     return Response(generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
 
 
 @app.route('/burn')
@@ -129,5 +145,4 @@ def burn1():
 
 
 if __name__ == '__main__':
-    
     app.run(debug=True)
